@@ -1,4 +1,4 @@
-rootProject.name = 'menstrual_tracker'
+rootProject.name = 'PeriodPal'
 
 dependencyResolutionManagement {
   versionCatalogs {

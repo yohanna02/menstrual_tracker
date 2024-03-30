@@ -1,4 +1,4 @@
-package com.yohanna02.menstrual_tracker
+package com.yohanna02periodpal
 
 import android.app.Application
 import android.content.res.Configuration

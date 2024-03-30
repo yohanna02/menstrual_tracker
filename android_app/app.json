@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "menstrual_tracker",
-    "slug": "menstrual_tracker",
+    "name": "PeriodPal",
+    "slug": "periodpal",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -17,14 +17,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yohanna02.menstrualtracker"
+      "bundleIdentifier": "com.yohanna02.periodpal"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.yohanna02.menstrual_tracker"
+      "package": "com.yohanna02periodpal"
     },
     "web": {
       "bundler": "metro",
