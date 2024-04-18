@@ -34,10 +34,11 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="index" options={{headerShown: false}} />
-        <Stack.Screen name="Signup" options={{headerShown: false}} />
-        <Stack.Screen name="Login" options={{headerShown: false}} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: "slide_from_left" }} />
+        <Stack.Screen name="index" options={{headerShown: false, animation: "slide_from_left"}} />
+        <Stack.Screen name="Signup" options={{headerShown: false, animation: "slide_from_left"}} />
+        <Stack.Screen name="Login" options={{headerShown: false, animation: "slide_from_left"}} />
+        <Stack.Screen name="OnBoarding" options={{headerShown: false, animation: "slide_from_left"}} />
       </Stack>
   );
 }

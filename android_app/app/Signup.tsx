@@ -9,12 +9,18 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const router = useRouter();
+
+  function signup() {
+    router.push("/OnBoarding");
+  }
 
   return (
     <View style={style.container}>
@@ -75,6 +81,7 @@ export default function Signup() {
             borderRadius: 11,
             marginTop: 20,
           }}
+          onPress={signup}
         >
           <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>
             Sign up

@@ -9,11 +9,11 @@ import {
   StatusBar
 } from "react-native";
 import { useState } from "react";
-import OnboardingData from "@/constants/OnboardingData";
+import SlidesData from "@/constants/SlidesData";
 import { Link } from "expo-router";
 import Colors from "@/constants/Colors";
 
-function OnBoarding() {
+function Index() {
   const { width } = useWindowDimensions();
 
   const [slideIndex, setSlideIndex] = useState(0);
@@ -22,7 +22,7 @@ function OnBoarding() {
     <View style={style.container}>
       <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
       <FlatList
-        data={OnboardingData}
+        data={SlidesData}
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -41,7 +41,7 @@ function OnBoarding() {
       />
 
       <View style={style.indicatorContainer}>
-        {OnboardingData.map((_, index) => (
+        {SlidesData.map((_, index) => (
           <View key={index} style={[style.indicator, slideIndex === index && { width: 20, backgroundColor: Colors.primary}]} />
         ))}
       </View>
@@ -119,4 +119,4 @@ const style = StyleSheet.create({
 
 });
 
-export default OnBoarding;
+export default Index;
