@@ -9,34 +9,27 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
+import { Link } from "expo-router";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const router = useRouter();
-
-  function signup() {
-    router.push("/OnBoarding");
-  }
 
   return (
     <View style={style.container}>
       <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
       <View style={style.textHeaderContainer}>
         <Image
-          source={require("../assets/images/adaptive-icon.png")}
+          source={require("../../assets/images/adaptive-icon.png")}
           style={style.headerImage}
         />
         <Text
           style={{ fontSize: 28, fontWeight: "700", color: Colors.primary }}
         >
-          Create an account
+          Login to your account
         </Text>
         <Text style={{ fontSize: 18, fontWeight: "400", color: "#8A8787" }}>
-          Input your details and sign up with us!
+          Login to continue using our app!
         </Text>
       </View>
       <View style={style.inputContainer}>
@@ -54,23 +47,16 @@ export default function Signup() {
           value={password}
           onChangeText={setPassword}
         />
-        <TextInput
-          style={style.input}
-          secureTextEntry={true}
-          placeholder="Confirm password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
       </View>
 
       <View style={{ width: "100%", padding: 20, alignItems: "center" }}>
         <Text style={{ fontSize: 18, fontWeight: "400" }}>
-          Already have an account?{" "}
+          Don't have an account?{" "}
           <Link
-            href="/Login"
+            href="/Signup"
             style={{ color: Colors.primary, fontWeight: "700" }}
           >
-            Log in
+            Sign up
           </Link>
         </Text>
         <TouchableOpacity
@@ -81,10 +67,9 @@ export default function Signup() {
             borderRadius: 11,
             marginTop: 20,
           }}
-          onPress={signup}
         >
           <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>
-            Sign up
+            Log in
           </Text>
         </TouchableOpacity>
       </View>

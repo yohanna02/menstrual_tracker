@@ -77,7 +77,7 @@ export default function OnBoarding() {
     } else if (view === 2) {
       setView(3);
     } else {
-      router.replace("/(tabs)");
+      router.replace("/(auth)/home");
       console.log("Finish");
     }
   }
@@ -103,7 +103,7 @@ export default function OnBoarding() {
       <StatusBar backgroundColor={"white"} barStyle={"dark-content"} />
       <View style={style.textHeaderContainer}>
         <Image
-          source={require("../assets/images/adaptive-icon.png")}
+          source={require("../../assets/images/adaptive-icon.png")}
           style={style.headerImage}
         />
         <Text
