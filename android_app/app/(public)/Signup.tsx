@@ -10,6 +10,18 @@ import {
   StatusBar,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import userStorage from "@/storage/user";
+
+interface SignupResponse {
+  message: string;
+  data: {
+    id: string;
+    email: string;
+  };
+  token: string;
+};
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -18,9 +30,24 @@ export default function Signup() {
 
   const router = useRouter();
 
-  function signup() {
-    router.push("/OnBoarding");
-  }
+  const signup = useMutation({
+    mutationFn: function() {
+      return axios.post("http://192.168.43.79:3000/auth/signup", {
+        email,
+        password,
+      });
+    },
+    onSuccess: function({ data }: { data: SignupResponse}) {
+      userStorage.set("isLoggedIn", true);
+      userStorage.set("token", data.token);
+      userStorage.set("user", JSON.stringify(data.data));
+      userStorage.set("onBoardingCompleted", false);
+      router.push("/OnBoarding");
+    },
+    onError: function(error) {
+      console.log(error);
+    }
+  });
 
   return (
     <View style={style.container}>
@@ -81,10 +108,11 @@ export default function Signup() {
             borderRadius: 11,
             marginTop: 20,
           }}
-          onPress={signup}
+          onPress={() => signup.mutate()}
+          disabled={signup.isPending}
         >
           <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>
-            Sign up
+            { signup.isPending ? "Loading..." : "Sign up" }
           </Text>
         </TouchableOpacity>
       </View>
