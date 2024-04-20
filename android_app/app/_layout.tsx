@@ -6,6 +6,7 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { setAuthFetchToken } from "@/lib/axios";
+import UserContextProvider from "@/context/userContext";
 
 export default function RootLayoutNav() {
 
@@ -26,7 +27,9 @@ export default function RootLayoutNav() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Slot />
+      <UserContextProvider>
+        <Slot />
+      </UserContextProvider>
     </QueryClientProvider>
   );
 }

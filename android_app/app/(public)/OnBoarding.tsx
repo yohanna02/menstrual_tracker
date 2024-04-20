@@ -98,6 +98,9 @@ export default function OnBoarding() {
       });
     },
     onSuccess: () => {
+      const user = JSON.parse(userStorage.getString("user")!);
+      user.name = name;
+      userStorage.set("user", JSON.stringify(user));
       userStorage.set("onBoardingCompleted", true);
       router.push("/(auth)/home");
     },
