@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import userStorage from "@/storage/user";
+import { setAuthFetchToken, standardFetch } from "@/lib/axios";
 
 interface SignupResponse {
   message: string;
@@ -32,7 +32,10 @@ export default function Signup() {
 
   const signup = useMutation({
     mutationFn: function() {
-      return axios.post("http://192.168.43.79:3000/auth/signup", {
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match!");
+      }
+      return standardFetch.post("/auth/signup", {
         email,
         password,
       });
@@ -40,12 +43,12 @@ export default function Signup() {
     onSuccess: function({ data }: { data: SignupResponse}) {
       userStorage.set("isLoggedIn", true);
       userStorage.set("token", data.token);
+      setAuthFetchToken(data.token);
       userStorage.set("user", JSON.stringify(data.data));
-      userStorage.set("onBoardingCompleted", false);
       router.push("/OnBoarding");
     },
-    onError: function(error) {
-      console.log(error);
+    onError: function(error: any) {
+      alert(error.response.data.message || "An error occured!");
     }
   });
 

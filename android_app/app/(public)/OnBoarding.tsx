@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -9,11 +9,15 @@ import {
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
+  BackHandler
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { Calendar } from "react-native-calendars";
 import { DateData, Theme } from "react-native-calendars/src/types";
+import { useMutation } from "@tanstack/react-query";
+import { authFetch } from "@/lib/axios";
+import userStorage from "@/storage/user";
 
 const peroidLength = [3, 4, 5, 6, 7, 8, 9, 10, 11];
 const cycleLength = [
@@ -39,6 +43,7 @@ export default function OnBoarding() {
   const [name, setName] = useState("");
   const [selectPeroidLength, setSelectPeroidLength] = useState(4);
   const [selectCycleLength, setSelectCycleLength] = useState(28);
+  const [lastPeriodDate, setLastPeriodDate] = useState(0);
   const { width } = useWindowDimensions();
 
   const calendarTheme: Theme = {
@@ -67,18 +72,51 @@ export default function OnBoarding() {
 
   const router = useRouter();
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener("hardwareBackPress", function() {
+      if (view === 0) {
+        if (router.canGoBack())
+          router.back();
+        else
+          BackHandler.exitApp();
+      } else {
+        setView(view - 1);
+      }
+      return true;
+    });
+
+    return () => backHandler.remove();
+  }, []);
+
+  const onBoard = useMutation({
+    mutationFn: async () => {
+      return await authFetch.post("/auth/onboarding", {
+        name,
+        periodLength: selectPeroidLength,
+        cycleLength: selectCycleLength,
+        lastPeriodDate,
+      });
+    },
+    onSuccess: () => {
+      userStorage.set("onBoardingCompleted", true);
+      router.push("/(auth)/home");
+    },
+    onError: (error: any) => {
+      alert(error.response.data.message || "An error occured!");
+    },
+  });
+
   function handleOnboarding() {
     if (view === 0) {
-      // if (name.length > 0) {
-      setView(1);
-      // }
+      if (name.length > 0) {
+        setView(1);
+      }
     } else if (view === 1) {
       setView(2);
     } else if (view === 2) {
       setView(3);
     } else {
-      router.replace("/(auth)/home");
-      console.log("Finish");
+      onBoard.mutate();
     }
   }
 
@@ -89,6 +127,7 @@ export default function OnBoarding() {
       return;
     }
 
+    setLastPeriodDate(day.timestamp);
     setSelectedDate({
       [day.dateString]: {
         selected: true,
@@ -171,7 +210,9 @@ export default function OnBoarding() {
           />
         )}
         <TouchableOpacity style={style.btn} onPress={handleOnboarding}>
-          <Text style={style.btnText}>Continue</Text>
+          <Text style={style.btnText}>
+            {view === 3 ? (onBoard.isPending ? "Loading..." : "Finish") : "Next"}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import "express-async-errors";
 import { errorLogger, errorResponder, invalidPathHandler } from "./middlewares/errorHandlers";
 import authHandler from "./api/auth";
 
