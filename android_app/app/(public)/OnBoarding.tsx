@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   Text,
   View,
@@ -9,7 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   useWindowDimensions,
-  BackHandler
+  BackHandler,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
@@ -18,6 +18,9 @@ import { DateData, Theme } from "react-native-calendars/src/types";
 import { useMutation } from "@tanstack/react-query";
 import { authFetch } from "@/lib/axios";
 import userStorage from "@/storage/user";
+import { userContext } from "@/context/userContext";
+
+import { MenstrualCycle } from "../../../server/node_modules/.prisma/client";
 
 const peroidLength = [3, 4, 5, 6, 7, 8, 9, 10, 11];
 const cycleLength = [
@@ -31,13 +34,22 @@ const viewTitle = [
   "Your last period date?",
 ];
 
-type Selected = {
-  [date: string]: {
-    selected: boolean;
-    marked: boolean;
-    selectedColor: string;
+type ResponseType = {
+  data: {
+    name: string;
+    cycles: MenstrualCycle[];
   };
-} | {};
+};
+
+type Selected =
+  | {
+      [date: string]: {
+        selected: boolean;
+        marked: boolean;
+        selectedColor: string;
+      };
+    }
+  | {};
 
 export default function OnBoarding() {
   const [name, setName] = useState("");
@@ -45,6 +57,8 @@ export default function OnBoarding() {
   const [selectCycleLength, setSelectCycleLength] = useState(28);
   const [lastPeriodDate, setLastPeriodDate] = useState(0);
   const { width } = useWindowDimensions();
+
+  const { setBleedingDates, setFertileDates, setOvulationDates } = useContext(userContext);
 
   const calendarTheme: Theme = {
     backgroundColor: "#ffffff",
@@ -73,17 +87,18 @@ export default function OnBoarding() {
   const router = useRouter();
 
   useEffect(() => {
-    const backHandler = BackHandler.addEventListener("hardwareBackPress", function() {
-      if (view === 0) {
-        if (router.canGoBack())
-          router.back();
-        else
-          BackHandler.exitApp();
-      } else {
-        setView(view - 1);
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      function () {
+        if (view === 0) {
+          if (router.canGoBack()) router.back();
+          else BackHandler.exitApp();
+        } else {
+          setView(view - 1);
+        }
+        return true;
       }
-      return true;
-    });
+    );
 
     return () => backHandler.remove();
   }, []);
@@ -97,15 +112,20 @@ export default function OnBoarding() {
         lastPeriodDate,
       });
     },
-    onSuccess: () => {
+    onSuccess: ({ data }: ResponseType) => {
+
       const user = JSON.parse(userStorage.getString("user")!);
-      user.name = name;
+      user.name = data.name;
       userStorage.set("user", JSON.stringify(user));
       userStorage.set("onBoardingCompleted", true);
+      setBleedingDates(data.cycles.map(cycle => cycle.bleedingDates).flat());
+      setFertileDates(data.cycles.map(cycle => cycle.fertileDates).flat());
+      setOvulationDates(data.cycles.map(cycle => cycle.ovulationDates).flat());
       router.push("/(auth)/home");
     },
     onError: (error: any) => {
       alert(error.response.data.message || "An error occured!");
+      console.log(error)
     },
   });
 
@@ -214,7 +234,11 @@ export default function OnBoarding() {
         )}
         <TouchableOpacity style={style.btn} onPress={handleOnboarding}>
           <Text style={style.btnText}>
-            {view === 3 ? (onBoard.isPending ? "Loading..." : "Finish") : "Next"}
+            {view === 3
+              ? onBoard.isPending
+                ? "Loading..."
+                : "Finish"
+              : "Next"}
           </Text>
         </TouchableOpacity>
       </View>

@@ -14,17 +14,23 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  email          String          @unique
-  name           String?
-  password       String
-  menstrualCycle MenstrualCycle?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  id                  String           @id @default(auto()) @map("_id") @db.ObjectId
+  email               String           @unique
+  name                String?
+  password            String
+  averagePeriodLength Int?
+  averageCycleLength  Int?
+  cycle               MenstrualCycle[]
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
 }
 
-type MenstrualCycle {
-  startDate           DateTime
-  averagePeriodLength Int
-  averageCycleLength  Int
+model MenstrualCycle {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  User           User?    @relation(fields: [userId], references: [id])
+  bleedingDates  String[]
+  fertileDates   String[]
+  ovulationDates String[]
+  userId         String?  @db.ObjectId
+  createAt       DateTime @default(now())
 }

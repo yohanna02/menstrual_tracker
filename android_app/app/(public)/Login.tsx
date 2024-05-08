@@ -9,11 +9,51 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import { setAuthFetchToken, standardFetch } from "@/lib/axios";
+import userStorage from "@/storage/user";
+
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+  onboardingCompleted: boolean;
+}
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const router = useRouter();
+
+  const login = useMutation({
+    mutationFn: function () {
+      return standardFetch.post("/auth/login", {
+        email,
+        password,
+      });
+    },
+    onSuccess: function ({ data }: { data: LoginResponse }) {
+      console.log(data);
+      userStorage.set("isLoggedIn", true);
+      userStorage.set("token", data.token);
+      setAuthFetchToken(data.token);
+      userStorage.set("user", JSON.stringify(data.user));
+
+      if (!data.onboardingCompleted) {
+        router.replace("/OnBoarding");
+      } else {
+        router.replace("/home");
+      }
+    },
+    onError: function (error: any) {
+      alert(error.response.data.message || "An error occured!");
+    },
+  });
 
   return (
     <View style={style.container}>
@@ -67,9 +107,11 @@ export default function Signup() {
             borderRadius: 11,
             marginTop: 20,
           }}
+          onPress={() => login.mutate()}
+          disabled={login.isPending}
         >
           <Text style={{ color: "white", textAlign: "center", fontSize: 22 }}>
-            Log in
+            {login.isPending ? "Loading..." : "Login"}
           </Text>
         </TouchableOpacity>
       </View>

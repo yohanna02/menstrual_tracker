@@ -1,33 +1,51 @@
-import {
-  JSXElementConstructor,
-  ReactElement,
-  ReactNode,
-  ReactPortal,
-  createContext,
-  useState,
-} from "react";
+import { createContext, useState } from "react";
 
-export const userContext = createContext<{
-  user: any;
-  setUser: any;
-}>({ user: null, setUser: null });
+type userType = { id: string; name: string; email: string };
 
-const UserContextProvider = (props: {
-  children:
-    | string
-    | number
-    | boolean
-    | ReactElement<any, string | JSXElementConstructor<any>>
-    | Iterable<ReactNode>
-    | ReactPortal
-    | null
-    | undefined;
+type userContextType = {
+  user: userType | null;
+  setUser: React.Dispatch<React.SetStateAction<userType | null>>;
+  bleedingDates: string[];
+  setBleedingDates: React.Dispatch<React.SetStateAction<string[]>>;
+  ovulationDates: string[];
+  setOvulationDates: React.Dispatch<React.SetStateAction<string[]>>;
+  fertileDates: string[];
+  setFertileDates: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+export const userContext = createContext<userContextType>({
+  user: null,
+  setUser: (): userType | null => null,
+  bleedingDates: [],
+  setBleedingDates: () => [],
+  ovulationDates: [],
+  setOvulationDates: () => [],
+  fertileDates: [],
+  setFertileDates: () => [],
+});
+
+const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
 }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<userType | null>(null);
+  const [bleedingDates, setBleedingDates] = useState<string[]>([]);
+  const [ovulationDates, setOvulationDates] = useState<string[]>([]);
+  const [fertileDates, setFertileDates] = useState<string[]>([]);
 
   return (
-    <userContext.Provider value={{ user, setUser }}>
-      {props.children}
+    <userContext.Provider
+      value={{
+        user,
+        setUser,
+        bleedingDates,
+        setBleedingDates,
+        ovulationDates,
+        setOvulationDates,
+        fertileDates,
+        setFertileDates,
+      }}
+    >
+      {children}
     </userContext.Provider>
   );
 };

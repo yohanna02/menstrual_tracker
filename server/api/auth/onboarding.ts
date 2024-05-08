@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import ValidationError from "../../interface/Errors/ValidationError";
-import { User } from "@prisma/client";
+import { MenstrualCycle, User } from "@prisma/client";
 import db from "../../db";
 import AppError from "../../interface/Errors/AppError";
 
@@ -13,7 +13,7 @@ const onboardingSchema = z.object({
 });
 
 export default async function onboarding(req: Request, res: Response) {
-    const { name, periodLength, cycleLength, lastPeriodDate } = req.body;
+    let { name, periodLength, cycleLength, lastPeriodDate } = req.body;
 
     const validationResponse = onboardingSchema.safeParse(req.body);
     if (!validationResponse.success) {
@@ -37,16 +37,82 @@ export default async function onboarding(req: Request, res: Response) {
         },
         data: {
             name,
-            menstrualCycle: {
-                startDate: new Date(lastPeriodDate),
-                averageCycleLength: cycleLength,
-                averagePeriodLength: periodLength
-            }
+            averageCycleLength: cycleLength,
+            averagePeriodLength: periodLength
         }
     });
 
-    res.status(201).json({
-        message: "Onboarding completed successfully",
-        name
+    const cycles: Partial<MenstrualCycle>[] = [];
+    // generate cycle data
+    for (let j = 0; j < 12; j++) {
+        // full day timestamp
+        const fullDateTimestamp = 86400000;
+
+        const bleedingDatesString: string[] = [];
+        for (let i = 0; i < periodLength; i++) {
+            bleedingDatesString.push(convertDateToString(lastPeriodDate + (i * fullDateTimestamp)));
+        }
+
+        const ovulationDate = (lastPeriodDate + (13 * fullDateTimestamp)) - (fullDateTimestamp * 2);
+        const ovulationDatesString: string[] = [];
+        for (let i = 0; i < 5; i++) {
+            ovulationDatesString.push(convertDateToString(ovulationDate + (i * fullDateTimestamp)));
+        }
+
+        const lastBleedingDay = getDateTimeStamp(bleedingDatesString[bleedingDatesString.length - 1]);
+        const fertileDatesString: string[] = [];
+        let i = 1;
+        while (true) {
+            fertileDatesString.push(convertDateToString(lastBleedingDay + (i * fullDateTimestamp)));
+            i++;
+
+            if (fertileDatesString[fertileDatesString.length - 1] === ovulationDatesString[0]) {
+                break;
+            }
+        }
+
+        //convert datetimestamp to string date
+        // const bleedingDatesString = bleedingDates.map(date => convertDateToString(date));
+        // const ovulationDatesString = ovulationDates.map(date => convertDateToString(date));
+        // const fertileDatesString = fertileDates.map(date => convertDateToString(date));
+
+        const cycle: Partial<MenstrualCycle> = {
+            bleedingDates: bleedingDatesString,
+            ovulationDates: ovulationDatesString,
+            fertileDates: fertileDatesString,
+            userId: loggedInUser.id,
+        };
+        cycles.push(cycle);
+        // console.log(firstBleedingDay.getDate());
+        // sumLastPeriodDate += fullDateTimestamp + cycleLength;
+        // firstBleedingDay.setDate(firstBleedingDay.getDate() + cycleLength);
+        lastPeriodDate = lastPeriodDate + fullDateTimestamp * cycleLength;
+    }
+
+    await db.menstrualCycle.createMany({
+        data: cycles
     });
+
+    const cyclesData = await db.menstrualCycle.findMany({
+        where: { userId: loggedInUser.id },
+    });
+
+    // console.log(cyclesData);
+
+    res.status(201).json({
+        name,
+        cycles: cyclesData
+    });
+}
+
+function getDateTimeStamp(date: string): number {
+    return new Date(date).getTime();
+}
+
+function convertDateToString(date: number): string {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }

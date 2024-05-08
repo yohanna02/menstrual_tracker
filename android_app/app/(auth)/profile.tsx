@@ -16,8 +16,8 @@ export default function profile() {
   }
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>{user.name}</Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "white" }}>
+      { user && <Text>{ user.name }</Text> }
       <TouchableOpacity
         style={{
           padding: 10,
