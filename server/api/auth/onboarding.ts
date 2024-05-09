@@ -71,11 +71,6 @@ export default async function onboarding(req: Request, res: Response) {
             }
         }
 
-        //convert datetimestamp to string date
-        // const bleedingDatesString = bleedingDates.map(date => convertDateToString(date));
-        // const ovulationDatesString = ovulationDates.map(date => convertDateToString(date));
-        // const fertileDatesString = fertileDates.map(date => convertDateToString(date));
-
         const cycle: Partial<MenstrualCycle> = {
             bleedingDates: bleedingDatesString,
             ovulationDates: ovulationDatesString,
@@ -83,9 +78,6 @@ export default async function onboarding(req: Request, res: Response) {
             userId: loggedInUser.id,
         };
         cycles.push(cycle);
-        // console.log(firstBleedingDay.getDate());
-        // sumLastPeriodDate += fullDateTimestamp + cycleLength;
-        // firstBleedingDay.setDate(firstBleedingDay.getDate() + cycleLength);
         lastPeriodDate = lastPeriodDate + fullDateTimestamp * cycleLength;
     }
 
@@ -95,9 +87,12 @@ export default async function onboarding(req: Request, res: Response) {
 
     const cyclesData = await db.menstrualCycle.findMany({
         where: { userId: loggedInUser.id },
+        select: {
+            bleedingDates: true,
+            ovulationDates: true,
+            fertileDates: true
+        }
     });
-
-    // console.log(cyclesData);
 
     res.status(201).json({
         name,

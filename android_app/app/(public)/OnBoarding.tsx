@@ -37,7 +37,7 @@ const viewTitle = [
 type ResponseType = {
   data: {
     name: string;
-    cycles: MenstrualCycle[];
+    cycles: Pick<MenstrualCycle, "bleedingDates" | "fertileDates" | "ovulationDates">[];
   };
 };
 
@@ -118,14 +118,19 @@ export default function OnBoarding() {
       user.name = data.name;
       userStorage.set("user", JSON.stringify(user));
       userStorage.set("onBoardingCompleted", true);
-      setBleedingDates(data.cycles.map(cycle => cycle.bleedingDates).flat());
-      setFertileDates(data.cycles.map(cycle => cycle.fertileDates).flat());
-      setOvulationDates(data.cycles.map(cycle => cycle.ovulationDates).flat());
+      const bleedingDates = data.cycles.map(cycle => cycle.bleedingDates).flat();
+      const fertileDates = data.cycles.map(cycle => cycle.fertileDates).flat();
+      const ovulationDates = data.cycles.map(cycle => cycle.ovulationDates).flat();
+      userStorage.set("bleedingDates", JSON.stringify(bleedingDates));
+      userStorage.set("fertileDates", JSON.stringify(fertileDates));
+      userStorage.set("ovulationDates", JSON.stringify(ovulationDates));
+      setBleedingDates(bleedingDates);
+      setFertileDates(fertileDates);
+      setOvulationDates(ovulationDates);
       router.push("/(auth)/home");
     },
     onError: (error: any) => {
       alert(error.response.data.message || "An error occured!");
-      console.log(error)
     },
   });
 

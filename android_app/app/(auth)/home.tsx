@@ -9,12 +9,13 @@ import {
   Image,
   FlatList,
 } from "react-native";
-import { useState, useContext, useMemo } from "react";
+import { useState, useContext, useMemo, useEffect } from "react";
 import { Calendar } from "react-native-calendars";
 import Colors from "@/constants/Colors";
 import { MarkedDates, Theme } from "react-native-calendars/src/types";
 import { Link } from "expo-router";
 import { userContext } from "@/context/userContext";
+import userStorage from "@/storage/user";
 
 const buttons = [
   {
@@ -97,10 +98,14 @@ export default function TabOneScreen() {
   const [selected, setSelected] = useState("");
   const { width } = useWindowDimensions();
 
-  const { user, bleedingDates, fertileDates, ovulationDates } =
+  const { user, bleedingDates, fertileDates, ovulationDates, setBleedingDates, setFertileDates, setOvulationDates } =
     useContext(userContext);
 
-    // console.log(bleedingDates)
+    useEffect(function() {
+      setBleedingDates(JSON.parse(userStorage.getString("bleedingDates")!));
+      setFertileDates(JSON.parse(userStorage.getString("fertileDates")!));
+      setOvulationDates(JSON.parse(userStorage.getString("ovulationDates")!));
+    }, []);
 
   const [selectedFeelingIndex, setSelectedFeelingIndex] = useState(-1);
 

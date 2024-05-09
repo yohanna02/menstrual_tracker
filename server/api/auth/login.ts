@@ -27,6 +27,17 @@ export default async function login(req: Request, res: Response) {
 
     const token = jsonwebtoken.sign({ id: user.id }, process.env.JWT_SECRET!);
 
+    const cyclesData = await db.menstrualCycle.findMany({
+        where: {
+            userId: user.id
+        },
+        select: {
+            bleedingDates: true,
+            fertileDates: true,
+            ovulationDates: true
+        }
+    });
+
     res.json({
         token,
         user: {
@@ -34,6 +45,7 @@ export default async function login(req: Request, res: Response) {
             email: user.email,
             name: user.name
         },
-        onboardingCompleted: user.name !== null && user.averageCycleLength !== null && user.averagePeriodLength !== null
+        onboardingCompleted: user.name !== null && user.averageCycleLength !== null && user.averagePeriodLength !== null,
+        cycles: cyclesData
     });
 }

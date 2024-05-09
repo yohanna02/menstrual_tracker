@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import {
   Text,
   View,
@@ -13,6 +13,8 @@ import { Link, useRouter } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
 import { setAuthFetchToken, standardFetch } from "@/lib/axios";
 import userStorage from "@/storage/user";
+import { MenstrualCycle } from "../../../server/node_modules/.prisma/client";
+import { userContext } from "@/context/userContext";
 
 interface LoginResponse {
   token: string;
@@ -22,11 +24,17 @@ interface LoginResponse {
     name: string;
   };
   onboardingCompleted: boolean;
+  cycles: Pick<
+    MenstrualCycle,
+    "bleedingDates" | "fertileDates" | "ovulationDates"
+  >[];
 }
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setBleedingDates, setFertileDates, setOvulationDates } =
+    useContext(userContext);
 
   const router = useRouter();
 
@@ -38,7 +46,7 @@ export default function Signup() {
       });
     },
     onSuccess: function ({ data }: { data: LoginResponse }) {
-      console.log(data);
+      console.log("hi")
       userStorage.set("isLoggedIn", true);
       userStorage.set("token", data.token);
       setAuthFetchToken(data.token);
@@ -47,6 +55,24 @@ export default function Signup() {
       if (!data.onboardingCompleted) {
         router.replace("/OnBoarding");
       } else {
+        if (data.cycles.length > 0) {
+          userStorage.set("onBoardingCompleted", true);
+          const bleedingDates = data.cycles
+            .map((cycle) => cycle.bleedingDates)
+            .flat();
+          const fertileDates = data.cycles
+            .map((cycle) => cycle.fertileDates)
+            .flat();
+          const ovulationDates = data.cycles
+            .map((cycle) => cycle.ovulationDates)
+            .flat();
+          userStorage.set("bleedingDates", JSON.stringify(bleedingDates));
+          userStorage.set("fertileDates", JSON.stringify(fertileDates));
+          userStorage.set("ovulationDates", JSON.stringify(ovulationDates));
+          setBleedingDates(bleedingDates);
+          setFertileDates(fertileDates);
+          setOvulationDates(ovulationDates);
+        }
         router.replace("/home");
       }
     },

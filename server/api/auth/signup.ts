@@ -19,8 +19,6 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 export default async function SignupController(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    console.log(req.body);
-
     const user = await db.user.findUnique({
         where: {
             email
