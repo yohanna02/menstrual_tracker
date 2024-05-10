@@ -16,6 +16,7 @@ import { MarkedDates, Theme } from "react-native-calendars/src/types";
 import { Link } from "expo-router";
 import { userContext } from "@/context/userContext";
 import userStorage from "@/storage/user";
+import { insightCard } from "@/constants/SlidesData";
 
 const buttons = [
   {
@@ -56,43 +57,7 @@ const buttons = [
   },
 ];
 
-const cards = [
-  {
-    text: "The Menstrual Cycle",
-    image: require("@/assets/images/cycle.png"),
-    color: "#F9E9DE",
-  },
-  {
-    text: "Irregular Periods",
-    image: require("@/assets/images/irregular-period.png"),
-    color: "#C3C193",
-  },
-  {
-    text: "Dealing with cramps",
-    image: require("@/assets/images/cramps.png"),
-    color: "#E3D0E9",
-  },
-  {
-    text: "Late Periods",
-    image: require("@/assets/images/late-period.png"),
-    color: "#5E1707",
-  },
-  {
-    text: "Mind and Body",
-    image: require("@/assets/images/mind-body.png"),
-    color: "#CAD1F3",
-  },
-  {
-    text: "Period blood colour",
-    image: require("@/assets/images/blood.png"),
-    color: "#B79A7D",
-  },
-  {
-    text: "Signs of Pregnancy",
-    image: require("@/assets/images/pregnancy.png"),
-    color: "#F2BEEC",
-  },
-];
+const cards = insightCard;
 
 export default function TabOneScreen() {
   const [selected, setSelected] = useState("");
@@ -299,7 +264,7 @@ export default function TabOneScreen() {
                       <View style={{ width: 10 }} />
                     )}
                     renderItem={({ item: card, index }) => (
-                      <Link href="/modal" asChild>
+                      <Link href={`/(modal)/${index}`} asChild>
                         <TouchableOpacity
                           style={{
                             padding: 20,
