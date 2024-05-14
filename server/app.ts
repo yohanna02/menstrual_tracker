@@ -4,6 +4,8 @@ import "express-async-errors";
 import { errorLogger, errorResponder, invalidPathHandler } from "./middlewares/errorHandlers";
 import authHandler from "./api/auth";
 import cycleHandler from "./api/cycle";
+import logHandler from "./api/log";
+import isAuthenticated from "./middlewares/isAuthenticated";
 
 dotenv.config();
 
@@ -12,7 +14,8 @@ const app = express();
 app.use(express.json());
 
 app.use("/auth", authHandler);
-app.use("/cycle", cycleHandler);
+app.use("/cycle", isAuthenticated, cycleHandler);
+app.use("/log", isAuthenticated, logHandler);
 
 //Error handlers
 app.use(errorLogger);

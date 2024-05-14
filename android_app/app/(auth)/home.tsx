@@ -12,50 +12,13 @@ import {
 import { useState, useContext, useMemo, useEffect } from "react";
 import { Calendar } from "react-native-calendars";
 import Colors from "@/constants/Colors";
-import { MarkedDates, Theme } from "react-native-calendars/src/types";
+import { Theme } from "react-native-calendars/src/types";
 import { Link } from "expo-router";
 import { userContext } from "@/context/userContext";
 import userStorage from "@/storage/user";
 import { insightCard } from "@/constants/SlidesData";
+import FeelingLogger from "@/components/FeelingLogger";
 
-const buttons = [
-  {
-    label: "Happy",
-    color: "#FFFF00",
-  },
-  {
-    label: "Anxious",
-    color: "#808080",
-  },
-  {
-    label: "Angry",
-    color: "#FF0000",
-  },
-  {
-    label: "Depressed",
-    color: "#000080",
-  },
-  {
-    label: "Hungry",
-    color: "#FFA500",
-  },
-  {
-    label: "Agitated",
-    color: "#FF4500",
-  },
-  {
-    label: "Uncomfortable",
-    color: "#556B2F",
-  },
-  {
-    label: "Sad",
-    color: "#6A5ACD",
-  },
-  {
-    label: "Exhausted",
-    color: "#444444",
-  },
-];
 
 const cards = insightCard;
 
@@ -66,13 +29,13 @@ export default function TabOneScreen() {
   const { user, bleedingDates, fertileDates, ovulationDates, setBleedingDates, setFertileDates, setOvulationDates } =
     useContext(userContext);
 
-    useEffect(function() {
-      setBleedingDates(JSON.parse(userStorage.getString("bleedingDates")!));
-      setFertileDates(JSON.parse(userStorage.getString("fertileDates")!));
-      setOvulationDates(JSON.parse(userStorage.getString("ovulationDates")!));
-    }, []);
+  useEffect(function() {
+    setBleedingDates(JSON.parse(userStorage.getString("bleedingDates")!));
+    setFertileDates(JSON.parse(userStorage.getString("fertileDates")!));
+    setOvulationDates(JSON.parse(userStorage.getString("ovulationDates")!));
+  }, []);
 
-  const [selectedFeelingIndex, setSelectedFeelingIndex] = useState(-1);
+  
 
   const bleeding = useMemo(function () {
     const dates = bleedingDates.map((date, index) => ({
@@ -204,41 +167,7 @@ export default function TabOneScreen() {
                 <Text>Today</Text>
               </View>
             </View>
-
-            <View style={{ width: width - 30 }}>
-              <Text
-                style={{ fontSize: 20, marginVertical: 20, fontWeight: "bold" }}
-              >
-                How are you feeling today?
-              </Text>
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
-                {buttons.map((button, index) => (
-                  <TouchableOpacity
-                    key={button.label}
-                    style={{
-                      borderWidth: 2,
-                      borderColor: button.color,
-                      paddingVertical: 10,
-                      paddingHorizontal: 15,
-                      borderRadius: 10,
-                      backgroundColor:
-                        selectedFeelingIndex === index ? button.color : "white",
-                    }}
-                    onPress={() => setSelectedFeelingIndex(index)}
-                  >
-                    <Text
-                      style={{
-                        color:
-                          selectedFeelingIndex === index ? "white" : "black",
-                      }}
-                    >
-                      {button.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
+            <FeelingLogger />
             <View style={{ width: width, alignItems: "center" }}>
               <Text
                 style={{

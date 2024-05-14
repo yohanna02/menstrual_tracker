@@ -21,6 +21,7 @@ model User {
   averagePeriodLength Int?
   averageCycleLength  Int?
   cycle               MenstrualCycle[]
+  logs                Logs[]
   createdAt           DateTime         @default(now())
   updatedAt           DateTime         @updatedAt
 }
@@ -33,4 +34,24 @@ model MenstrualCycle {
   ovulationDates String[]
   userId         String?  @db.ObjectId
   createAt       DateTime @default(now())
+}
+
+enum Mood {
+  HAPPY
+  ANXIOUS
+  ANGRY
+  DEPRESSED
+  HUNGRY
+  AGITATED
+  UNCOMFORTABLE
+  SAD
+  EXHAUSTED
+}
+
+model Logs {
+  id     String   @id @default(auto()) @map("_id") @db.ObjectId
+  month  DateTime @unique
+  mood   Mood
+  User   User     @relation(fields: [userId], references: [id])
+  userId String   @db.ObjectId
 }

@@ -31,7 +31,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="logs"
         options={{
-          headerShown: false,
+          headerShown: true,
           tabBarActiveTintColor: Colors.primary,
           tabBarLabel: () => null,
           tabBarIcon: ({ color }) => (

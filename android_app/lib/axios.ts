@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://192.168.43.79:3000";
+const BASE_URL = "http://192.168.43.80:3000";
 
 export const standardFetch = axios.create({
     baseURL: BASE_URL,
