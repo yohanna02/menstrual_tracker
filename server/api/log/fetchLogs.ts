@@ -12,22 +12,6 @@ export default async function (req: Request, res: Response) {
     const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
 
-    // const logs = await db.logs.findMany({
-    //     where: {
-    //         month: {
-    //             gte: startOfMonth,
-    //             lte: endOfMonth
-    //         },
-    //         userId: user.id
-    //     }
-    // });
-
-    /* 
-        labels: ["Happy", "Sad", "Angry", "Neutral"]
-        data: [1, 2, 3, 4]
-
-        this will be used to display the mood data in the chart
-    */
     const moodData = await db.logs.groupBy({
         by: ["mood"],
         _count: {

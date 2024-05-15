@@ -11,6 +11,8 @@ type userContextType = {
   setOvulationDates: React.Dispatch<React.SetStateAction<string[]>>;
   fertileDates: string[];
   setFertileDates: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedFeelingIndex: number;
+  setSelectedFeelingIndex: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const userContext = createContext<userContextType>({
@@ -22,6 +24,8 @@ export const userContext = createContext<userContextType>({
   setOvulationDates: () => [],
   fertileDates: [],
   setFertileDates: () => [],
+  selectedFeelingIndex: -1,
+  setSelectedFeelingIndex: () => -1,
 });
 
 const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -31,6 +35,7 @@ const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [bleedingDates, setBleedingDates] = useState<string[]>([]);
   const [ovulationDates, setOvulationDates] = useState<string[]>([]);
   const [fertileDates, setFertileDates] = useState<string[]>([]);
+  const [selectedFeelingIndex, setSelectedFeelingIndex] = useState<number>(-1);
 
   return (
     <userContext.Provider
@@ -43,6 +48,8 @@ const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
         setOvulationDates,
         fertileDates,
         setFertileDates,
+        selectedFeelingIndex,
+        setSelectedFeelingIndex
       }}
     >
       {children}
