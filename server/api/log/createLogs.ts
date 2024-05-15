@@ -15,8 +15,6 @@ export default async function (req: Request, res: Response) {
     month.setHours(1, 0, 0, 0);
 
     const logs = await db.logs.findUnique({ where: { month, userId: user.id } });
-    console.log(body.month)
-    console.log(month)
 
     if (logs) {
         await db.logs.update({
