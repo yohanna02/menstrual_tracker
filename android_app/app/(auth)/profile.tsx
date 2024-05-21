@@ -8,19 +8,52 @@ import {
   Switch,
   Alert,
 } from "react-native";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useRouter } from "expo-router";
-import { AntDesign, Feather, MaterialIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import * as LocalAuthentication from "expo-local-authentication";
 import Colors from "@/constants/Colors";
 import { userContext } from "@/context/userContext";
 import userStorage from "@/storage/user";
 
 export default function profile() {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const { user, setUser, bioAuthEnabled, setBioAuthEnabled } = useContext(userContext);
 
-  const { user, setUser } = useContext(userContext);
+  const [localAuth, setLocalAuth] = useState(true);
+  const [isFaceId, setIsFaceId] = useState(false);
+  function toggleSwitch() {
+    if (!bioAuthEnabled) {
+      userStorage.set("bio_ask", false);
+    }
+    setBioAuthEnabled((previousState) => {
+      return !previousState;
+    });
+  }
+
   const router = useRouter();
+
+  useEffect(function () {
+    LocalAuthentication.hasHardwareAsync().then(function (hasHardware) {
+      LocalAuthentication.isEnrolledAsync().then(function (isEnrolled) {
+        if (!hasHardware || !isEnrolled) {
+          setLocalAuth(false);
+        }
+
+        LocalAuthentication.supportedAuthenticationTypesAsync().then(function (
+          type
+        ) {
+          if (type[0] === 2 || type[1] === 2) {
+            setIsFaceId(true);
+          }
+        });
+      });
+    });
+  }, []);
 
   function handleLogout() {
     Alert.alert("Logout", "Are you sure you want to logout?", [
@@ -79,20 +112,30 @@ export default function profile() {
               />
             </TouchableOpacity>
           </Link>
-          <View style={styles.btn}>
-            <MaterialIcons name="fingerprint" size={28} color="black" />
-            <View>
-              <Text style={styles.btnTextBig}>Enable biometric lock</Text>
+          {localAuth && (
+            <View style={styles.btn}>
+              {isFaceId ? (
+                <MaterialCommunityIcons
+                  name="face-recognition"
+                  size={24}
+                  color="black"
+                />
+              ) : (
+                <MaterialIcons name="fingerprint" size={24} color="black" />
+              )}
+              <View>
+                <Text style={styles.btnTextBig}>Enable biometric lock</Text>
+              </View>
+              <Switch
+                trackColor={{ false: "#767577", true: Colors.primaryLight }}
+                thumbColor={bioAuthEnabled ? Colors.primary : "#f4f3f4"}
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={toggleSwitch}
+                value={bioAuthEnabled}
+                style={{ marginLeft: "auto" }}
+              />
             </View>
-            <Switch
-              trackColor={{ false: "#767577", true: Colors.primaryLight }}
-              thumbColor={isEnabled ? Colors.primary : "#f4f3f4"}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={toggleSwitch}
-              value={isEnabled}
-              style={{ marginLeft: "auto" }}
-            />
-          </View>
+          )}
           <TouchableOpacity style={styles.btn} onPress={handleLogout}>
             <MaterialIcons name="logout" size={28} color="black" />
             <View>

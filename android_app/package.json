@@ -42,7 +42,8 @@
     "react-native-share": "^10.2.0",
     "react-native-svg": "^15.2.0",
     "react-native-web": "~0.19.6",
-    "react-native-wheel-scrollview-picker": "^2.0.4"
+    "react-native-wheel-scrollview-picker": "^2.0.4",
+    "expo-local-authentication": "~13.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
