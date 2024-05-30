@@ -1,7 +1,7 @@
 import axios from "axios";
 
-// const BASE_URL = "https://menstrual-tracker-latest.onrender.com";
-const BASE_URL = "http://192.168.43.80:3000";
+const BASE_URL = "https://menstrual-tracker-latest.onrender.com";
+// const BASE_URL = "http://192.168.43.80:3000";
 
 export const standardFetch = axios.create({
     baseURL: BASE_URL,

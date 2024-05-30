@@ -46,7 +46,6 @@ export default function Signup() {
       });
     },
     onSuccess: function ({ data }: { data: LoginResponse }) {
-      console.log("hi")
       userStorage.set("isLoggedIn", true);
       userStorage.set("token", data.token);
       setAuthFetchToken(data.token);

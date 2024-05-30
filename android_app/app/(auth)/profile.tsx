@@ -192,12 +192,12 @@ export default function profile() {
               style={{ marginLeft: "auto" }}
             />
           </TouchableOpacity>
-          {/* <View style={styles.btn}>
+          <View style={styles.btn}>
             <Octicons name="versions" size={28} color="black" />
             <View>
               <Text style={styles.btnTextBig}>Version: {Constants?.nativeAppVersion}</Text>
             </View>
-          </View> */}
+          </View>
           <TouchableOpacity style={styles.btn} onPress={handleLogout}>
             <MaterialIcons name="logout" size={28} color="black" />
             <View>
