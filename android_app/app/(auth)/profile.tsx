@@ -15,14 +15,19 @@ import {
   Feather,
   MaterialIcons,
   MaterialCommunityIcons,
+  Octicons,
 } from "@expo/vector-icons";
 import * as LocalAuthentication from "expo-local-authentication";
 import Colors from "@/constants/Colors";
 import { userContext } from "@/context/userContext";
 import userStorage from "@/storage/user";
+import * as Updates from "expo-updates";
+import Constants from "expo-constants";
 
 export default function profile() {
-  const { user, setUser, bioAuthEnabled, setBioAuthEnabled } = useContext(userContext);
+  const { user, setUser, bioAuthEnabled, setBioAuthEnabled } =
+    useContext(userContext);
+  const { isUpdateAvailable, isUpdatePending } = Updates.useUpdates();
 
   const [localAuth, setLocalAuth] = useState(true);
   const [isFaceId, setIsFaceId] = useState(false);
@@ -69,6 +74,28 @@ export default function profile() {
         },
       },
     ]);
+  }
+
+  function runUpdate() {
+    if (isUpdatePending) {
+      Alert.alert("Update pending", "Please wait for the update to finish");
+      return;
+    }
+
+    Updates.fetchUpdateAsync().then(function (update) {
+      if (update.isNew) {
+        Alert.alert("Update available", "Restart the app to update", [
+          {
+            text: "Restart",
+            onPress: function () {
+              Updates.reloadAsync();
+            },
+          },
+        ]);
+      } else {
+        Alert.alert("No update available", "You are on the latest version");
+      }
+    });
   }
 
   return (
@@ -138,6 +165,39 @@ export default function profile() {
               />
             </View>
           )}
+          <TouchableOpacity style={styles.btn} onPress={runUpdate}>
+            {isUpdateAvailable ? (
+              <>
+                <MaterialIcons name="security-update" size={28} color="black" />
+                <View>
+                  <Text style={styles.btnTextBig}>Update available</Text>
+                </View>
+              </>
+            ) : (
+              <>
+                <MaterialIcons
+                  name="security-update-good"
+                  size={28}
+                  color="black"
+                />
+                <View>
+                  <Text style={styles.btnTextBig}>Check for update</Text>
+                </View>
+              </>
+            )}
+            <MaterialIcons
+              name="arrow-forward-ios"
+              size={20}
+              color="black"
+              style={{ marginLeft: "auto" }}
+            />
+          </TouchableOpacity>
+          {/* <View style={styles.btn}>
+            <Octicons name="versions" size={28} color="black" />
+            <View>
+              <Text style={styles.btnTextBig}>Version: {Constants?.nativeAppVersion}</Text>
+            </View>
+          </View> */}
           <TouchableOpacity style={styles.btn} onPress={handleLogout}>
             <MaterialIcons name="logout" size={28} color="black" />
             <View>
