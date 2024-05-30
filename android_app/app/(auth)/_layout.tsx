@@ -7,7 +7,7 @@ import userStorage from "@/storage/user";
 
 export default function TabLayout() {
 
-  const { setUser, user } = useContext(userContext);
+  const { setUser } = useContext(userContext);
 
   useEffect(function() {
     const userObj = JSON.parse(userStorage.getString("user")!);

@@ -18,6 +18,8 @@ export default function RootLayoutNav() {
       router.replace("/OnBoarding");
     } else if (!userStorage.getBoolean("isLoggedIn")) {
       router.replace("/Landing");
+    } else if (userStorage.getBoolean("bio_auth") && userStorage.getBoolean("bio_auth") !== undefined) {
+      router.replace("/Lock");
     } else {
       router.replace("/home");
     }

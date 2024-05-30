@@ -8,15 +8,28 @@ import {
   useWindowDimensions,
   StatusBar
 } from "react-native";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import SlidesData from "@/constants/SlidesData";
 import { Link } from "expo-router";
 import Colors from "@/constants/Colors";
 
 function Index() {
   const { width } = useWindowDimensions();
+  const slideRef: any = useRef(null);
 
   const [slideIndex, setSlideIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSlideIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % SlidesData.length;
+        slideRef.current.scrollToIndex({ index: nextIndex, animated: true });
+        return nextIndex;
+      });
+    }, 3000); // Adjust the interval time as needed
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={style.container}>
@@ -38,6 +51,7 @@ function Index() {
           </View>
         )}
         onViewableItemsChanged={({viewableItems}) => {setSlideIndex(viewableItems[0].index!)}}
+        ref={slideRef}
       />
 
       <View style={style.indicatorContainer}>

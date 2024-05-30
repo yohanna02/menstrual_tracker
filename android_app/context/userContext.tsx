@@ -3,6 +3,8 @@ import { AppState } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
 // import { useRouter } from "expo-router";
 import userStorage from "@/storage/user";
+import { router } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 
 let show = false;
 type userType = { id: string; name: string; email: string };
@@ -47,34 +49,25 @@ const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [fertileDates, setFertileDates] = useState<string[]>([]);
   const [selectedFeelingIndex, setSelectedFeelingIndex] = useState<number>(-1);
   const [bioAuthEnabled, setBioAuthEnabled] = useState(false);
-  // const appState = useRef(AppState.currentState);
+  const appState = useRef(AppState.currentState);
 
-  useEffect(function () {
-    const isAuth = userStorage.getBoolean("bio_auth");
-
-    if (isAuth) {
-      setBioAuthEnabled(true);
-    } else {
-      setBioAuthEnabled(false);
+  useQuery({
+    queryKey: ["start"],
+    queryFn: async function () {
+      const isAuth = userStorage.getBoolean("bio_auth");
+  
+      if (isAuth) {
+        setBioAuthEnabled(true);
+      } else {
+        setBioAuthEnabled(false);
+      }
+      return true;
     }
-
-    // const subscription = AppState.addEventListener("change", function(state) {
-    //   if (appState.current.match(/inactive|background/) && state === "active") {
-    //     console.log(1);
-    //   } else if (state === "active") {
-    //     console.log(2);
-    //   }
-    //   appState.current = state;
-    // });
-
-    // return () => subscription.remove();
-  }, []);
+  })
 
   useEffect(
     function () {
-      userStorage.set("bio_auth", bioAuthEnabled);
-
-      if (!userStorage.getBoolean("bio_ask")) {
+      if (!userStorage.getBoolean("bio_ask") && userStorage.getBoolean("bio_ask") !== undefined) {
         LocalAuthentication.authenticateAsync({
           promptMessage: "Enable biometric lock",
         }).then(function ({ success }) {
@@ -85,6 +78,21 @@ const UserContextProvider: React.FC<{ children: React.ReactNode }> = ({
           }
         });
       }
+
+      const subscription = AppState.addEventListener("change", function(state) {
+        if (appState.current.match(/inactive|background/) && state === "active" && bioAuthEnabled) {
+          const elapsed = Date.now() - (userStorage.getNumber("startTime") || 0);
+  
+          if (elapsed >= 10000) {
+            router.replace("/Lock");
+          }
+        } else {
+          userStorage.set("startTime", Date.now());
+        }
+        appState.current = state;
+      });
+  
+      return () => subscription.remove();
     },
     [bioAuthEnabled]
   );

@@ -31,6 +31,7 @@ export default function profile() {
       userStorage.set("bio_ask", false);
     }
     setBioAuthEnabled((previousState) => {
+      userStorage.set("bio_auth", !previousState);
       return !previousState;
     });
   }
@@ -61,6 +62,7 @@ export default function profile() {
       {
         text: "OK",
         onPress: () => {
+          setBioAuthEnabled(false);
           userStorage.clearAll();
           setUser(null);
           router.replace("/Landing");
